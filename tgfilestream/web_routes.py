@@ -81,7 +81,7 @@ def managerReqCount(ip: str,file_id: str) -> None:
         pass
 
 def allow_request(ip: str,file_id: str) -> None:
-    managerReqCount(ip,file_id)
+    managerReqCount(ip,str(file_id))
     return ongoing_requests[ip] < request_limit
 
 
