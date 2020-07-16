@@ -38,6 +38,9 @@ async def handle_head_request(req: web.Request) -> web.Response:
 async def handle_get_request(req: web.Request) -> web.Response:
     return await handle_request(req, head=False)
 
+@routes.get('/')
+async def handle_main_page(req: web.Request) -> web.Response:
+    return web.Response(text="HDA File Distro Node 1")
 
 def allow_request(ip: str) -> None:
     return ongoing_requests[ip] < request_limit
