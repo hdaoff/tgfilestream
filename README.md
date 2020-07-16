@@ -1,5 +1,6 @@
 # tgfilestream
-A Telegram bot that can stream Telegram files to users over HTTP.
+Modified SC for the HDA Node
+
 
 ## Setup
 Install dependencies (see [requirements.txt](/requirements.txt)), configure
