@@ -56,6 +56,7 @@ def decrement_counter(ip: str) -> None:
 
 async def handle_request(req: web.Request, head: bool = False) -> web.Response:
     file_name = req.match_info["name"]
+    file_name = file_name.replace("[hdarena]","")
     file_id = int(req.match_info["id"])
     peer, msg_id = unpack_id(file_id)
     if not peer or not msg_id:
@@ -85,7 +86,6 @@ async def handle_request(req: web.Request, head: bool = False) -> web.Response:
     return web.Response(status=206 if (limit-offset != size) else 200,
                         body=body,
                         headers={
-                            "Content-Disposition": "attachment; filename=\"[hdarena{}]\"".format(file_name),
                             "Content-Type": message.file.mime_type,
                             "Content-Range": f"bytes {offset}-{limit}/{size}",
                             "Content-Length": str(limit - offset),
