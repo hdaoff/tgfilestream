@@ -45,7 +45,7 @@ async def handle_main_page(req: web.Request) -> web.Response:
     return web.Response(text="HDA File Distro Node 1")
 @routes.get('/getnodestats')
 async def handle_stats_page(req: web.Request) -> web.Response:
-    for i in ongoing_requests_info.keys():
+    for i in list(ongoing_requests_info):
             reqdate = ongoing_requests_info[i][1]
             dt = datetime.datetime.now() - reqdate
             if dt.seconds >= 10:
@@ -68,7 +68,7 @@ def managerReqCount(ip: str,file_id: str) -> None:
         else:
             ongoing_requests_info[ip+file_id][1] = datetime.datetime.now()
         
-        for i in ongoing_requests_info.keys():
+        for i in list(ongoing_requests_info):
             reqdate = ongoing_requests_info[i][1]
             dt = datetime.datetime.now() - reqdate
             if dt.seconds >= 10:
