@@ -20,7 +20,7 @@ import json
 
 from telethon.tl.custom import Message
 from aiohttp import web
-
+import datetime
 from .util import unpack_id, get_file_name, get_requester_ip
 from .config import request_limit
 from .telegram import client, transfer
@@ -28,6 +28,7 @@ from .telegram import client, transfer
 log = logging.getLogger(__name__)
 routes = web.RouteTableDef()
 ongoing_requests: Dict[str, int] = defaultdict(lambda: 0)
+ongoing_requests_info: Dict[str, list] = defaultdict(lambda: None)
 
 
 @routes.head(r"/{id:\d+}/{name}")
@@ -44,9 +45,43 @@ async def handle_main_page(req: web.Request) -> web.Response:
     return web.Response(text="HDA File Distro Node 1")
 @routes.get('/getnodestats')
 async def handle_stats_page(req: web.Request) -> web.Response:
+    for i in ongoing_requests_info.keys():
+            reqdate = ongoing_requests_info[i][1]
+            dt = datetime.datetime.now() - reqdate
+            if dt.seconds >= 10:
+                ongoing_requests[ongoing_requests_info[i][2]] -= 1
+                try:
+                    ongoing_requests_info.pop(i)
+                except KeyError:
+                    pass
+
     return web.Response(text=json.dumps(ongoing_requests))
 
-def allow_request(ip: str) -> None:
+def managerReqCount(ip: str,file_id: str) -> None:
+    if not (ip in ongoing_requests.keys()):
+        ongoing_requests[ip] = 1
+        ongoing_requests_info[ip+file_id] = [file_id,datetime.datetime.now(),ip]
+    else:
+        if not ip+file_id in ongoing_requests_info.keys():
+            ongoing_requests[ip] += 1
+            ongoing_requests_info[ip+file_id] = [file_id,datetime.datetime.now(),ip]
+        else:
+            ongoing_requests_info[ip+file_id][1] = datetime.datetime.now()
+        
+        for i in ongoing_requests_info.keys():
+            reqdate = ongoing_requests_info[i][1]
+            dt = datetime.datetime.now() - reqdate
+            if dt.seconds >= 10:
+                ongoing_requests[ongoing_requests_info[i][2]] -= 1
+                try:
+                    ongoing_requests_info.pop(i)
+                except KeyError:
+                    pass
+
+        pass
+
+def allow_request(ip: str,file_id: str) -> None:
+    managerReqCount(ip,file_id)
     return ongoing_requests[ip] < request_limit
 
 
@@ -56,6 +91,7 @@ def increment_counter(ip: str) -> None:
 
 def decrement_counter(ip: str) -> None:
     ongoing_requests[ip] -= 1
+
 
 
 async def handle_request(req: web.Request, head: bool = False) -> web.Response:
@@ -80,7 +116,7 @@ async def handle_request(req: web.Request, head: bool = False) -> web.Response:
                             headers={"Content-Range": f"bytes */{size}"})
     if not head:
         ip = get_requester_ip(req)
-        if not allow_request(ip):
+        if not allow_request(ip,file_id):
             return web.Response(status=429)
         log.info(f"Serving file in {message.id} (chat {message.chat_id}) to {ip}; Range: {offset} - {limit}")
         body = transfer.download(message.media, file_size=size, offset=offset, limit=limit)
