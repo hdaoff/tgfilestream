@@ -56,8 +56,6 @@ def decrement_counter(ip: str) -> None:
 
 async def handle_request(req: web.Request, head: bool = False) -> web.Response:
     file_name = req.match_info["name"]
-    file_name = file_name.replace("%5Bhdarena%5D","")
-    file_name = file_name.replace("[hdarena]","")
     file_id = int(req.match_info["id"])
     peer, msg_id = unpack_id(file_id)
     if not peer or not msg_id:
