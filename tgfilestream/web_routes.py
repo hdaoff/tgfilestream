@@ -70,16 +70,16 @@ def managerReqCount(ip: str,file_id: str) -> None:
         else:
             ongoing_requests_info[ip+file_id][1] = datetime.datetime.now()
         
-        for i in list(ongoing_requests_info):
-            reqdate = ongoing_requests_info[i][1]
-            dt = datetime.datetime.now() - reqdate
-            if dt.seconds >= 20:
-                log.info("the seconds are {} therefore 1 req less for file {}".format(dt,ongoing_requests_info[i][0]))
-                ongoing_requests[ongoing_requests_info[i][2]] -= 1
-                try:
-                    ongoing_requests_info.pop(i)
-                except KeyError:
-                    pass
+    for i in list(ongoing_requests_info):
+        reqdate = ongoing_requests_info[i][1]
+        dt = datetime.datetime.now() - reqdate
+        if dt.seconds >= 20:
+            log.info("the seconds are {} therefore 1 req less for file {}".format(dt,ongoing_requests_info[i][0]))
+            ongoing_requests[ongoing_requests_info[i][2]] -= 1
+            try:
+                ongoing_requests_info.pop(i)
+            except KeyError:
+                pass
 
 
 def allow_request(ip: str,file_id: str) -> None:
