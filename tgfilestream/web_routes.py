@@ -55,7 +55,7 @@ async def handle_stats_page(req: web.Request) -> web.Response:
                 except KeyError:
                     pass
 
-    return web.Response(text=json.dumps(ongoing_requests)+json.dumps(ongoing_requests_info))
+    return web.Response(text=json.dumps(ongoing_requests)+str(ongoing_requests_info))
 
 def managerReqCount(ip: str,file_id: str) -> None:
     if not (ip in ongoing_requests.keys()):
