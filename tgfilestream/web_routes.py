@@ -59,10 +59,12 @@ async def handle_stats_page(req: web.Request) -> web.Response:
 
 def managerReqCount(ip: str,file_id: str) -> None:
     if not (ip in ongoing_requests.keys()):
+        log.info("New ip registered")
         ongoing_requests[ip] = 1
         ongoing_requests_info[ip+file_id] = [file_id,datetime.datetime.now(),ip]
     else:
         if not ip+file_id in ongoing_requests_info.keys():
+            log.info("New file user the ip {} found.".format(ip))
             ongoing_requests[ip] += 1
             ongoing_requests_info[ip+file_id] = [file_id,datetime.datetime.now(),ip]
         else:
@@ -71,6 +73,7 @@ def managerReqCount(ip: str,file_id: str) -> None:
         for i in list(ongoing_requests_info):
             reqdate = ongoing_requests_info[i][1]
             dt = datetime.datetime.now() - reqdate
+            log.info("the seconds are {} therefore 1 req less for file {}".format(dt,ongoing_requests_info[i][0]))
             if dt.seconds >= 10:
                 ongoing_requests[ongoing_requests_info[i][2]] -= 1
                 try:
