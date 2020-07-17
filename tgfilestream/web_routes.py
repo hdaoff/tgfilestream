@@ -46,14 +46,14 @@ async def handle_main_page(req: web.Request) -> web.Response:
 @routes.get('/getnodestats')
 async def handle_stats_page(req: web.Request) -> web.Response:
     for i in list(ongoing_requests_info):
-            reqdate = ongoing_requests_info[i][1]
-            dt = datetime.datetime.now() - reqdate
-            if dt.seconds >= 20:
-                ongoing_requests[ongoing_requests_info[i][2]] -= 1
-                try:
-                    ongoing_requests_info.pop(i)
-                except KeyError:
-                    pass
+        reqdate = ongoing_requests_info[i][1]
+        dt = datetime.datetime.now() - reqdate
+        if dt.seconds >= 20:
+            ongoing_requests[ongoing_requests_info[i][2]] -= 1
+            try:
+                ongoing_requests_info.pop(i)
+            except KeyError:
+                pass
 
     return web.Response(text=json.dumps(ongoing_requests))
 
@@ -123,6 +123,7 @@ async def handle_request(req: web.Request, head: bool = False) -> web.Response:
         log.info(f"Serving file in {message.id} (chat {message.chat_id}) to {ip}; Range: {offset} - {limit}")
         body = transfer.download(message.media, file_size=size, offset=offset, limit=limit)
     else:
+        allow_request(ip,file_id)
         body = None
     return web.Response(status=206 if (limit-offset != size) else 200,
                         body=body,
