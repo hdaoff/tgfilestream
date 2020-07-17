@@ -122,6 +122,7 @@ async def handle_request(req: web.Request, head: bool = False) -> web.Response:
             return web.Response(status=429)
         log.info(f"Serving file in {message.id} (chat {message.chat_id}) to {ip}; Range: {offset} - {limit}")
         body = transfer.download(message.media, file_size=size, offset=offset, limit=limit)
+        log.info(f"Serving file Done in {message.id} (chat {message.chat_id}) to {ip}; Range: {offset} - {limit}")
     else:
         allow_request(ip,file_id)
         body = None
