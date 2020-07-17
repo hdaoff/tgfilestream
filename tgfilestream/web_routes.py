@@ -48,14 +48,14 @@ async def handle_stats_page(req: web.Request) -> web.Response:
     for i in list(ongoing_requests_info):
             reqdate = ongoing_requests_info[i][1]
             dt = datetime.datetime.now() - reqdate
-            if dt.seconds >= 10:
+            if dt.seconds >= 20:
                 ongoing_requests[ongoing_requests_info[i][2]] -= 1
                 try:
                     ongoing_requests_info.pop(i)
                 except KeyError:
                     pass
 
-    return web.Response(text=json.dumps(ongoing_requests))
+    return web.Response(text=json.dumps(ongoing_requests)+json.dumps(ongoing_requests_info))
 
 def managerReqCount(ip: str,file_id: str) -> None:
     if not (ip in ongoing_requests.keys()):
@@ -73,15 +73,14 @@ def managerReqCount(ip: str,file_id: str) -> None:
         for i in list(ongoing_requests_info):
             reqdate = ongoing_requests_info[i][1]
             dt = datetime.datetime.now() - reqdate
-            log.info("the seconds are {} therefore 1 req less for file {}".format(dt,ongoing_requests_info[i][0]))
-            if dt.seconds >= 10:
+            if dt.seconds >= 20:
+                log.info("the seconds are {} therefore 1 req less for file {}".format(dt,ongoing_requests_info[i][0]))
                 ongoing_requests[ongoing_requests_info[i][2]] -= 1
                 try:
                     ongoing_requests_info.pop(i)
                 except KeyError:
                     pass
 
-        pass
 
 def allow_request(ip: str,file_id: str) -> None:
     managerReqCount(ip,str(file_id))
