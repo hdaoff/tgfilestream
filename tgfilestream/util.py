@@ -49,6 +49,7 @@ def unpack_id(file_id: int) -> Tuple[TypeInputPeer, int]:
     msg_id = file_id >> msg_id_offset & pack_bit_mask
     if is_channel:
         peer = InputPeerChannel(channel_id=chat_id, access_hash=0)
+        peer = chat_id
     elif is_group:
         peer = InputPeerChat(chat_id=chat_id)
     else:
